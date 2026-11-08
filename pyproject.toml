@@ -1,0 +1,19 @@
+[project]
+name = "thaniverse"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { email = "thangbm@outlook.com" }
+]
+requires-python = ">=3.15"
+dependencies = [
+    "openai>=3.46.0",
+]
+
+[project.scripts]
+thaniverse = "thaniverse:main"
+
+[build-system]
+requires = ["uv_build>=0.13.7,<0.14.0"]
+build-backend = "uv_build"
