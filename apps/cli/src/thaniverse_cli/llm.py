@@ -1,5 +1,5 @@
 import os
-import sys
+import subprocess
 
 from dotenv import load_dotenv
 from openai import OpenAI
@@ -16,11 +16,7 @@ user_input = input("Enter your prompt: ")
 SYSTEM_PROMPT = """
 You are a coding agent. Your job is to code efficiently and accurately based on the user's prompts.
 Use the bash tool to inspect files.
-Always provide the most optimal solution and explain your reasoning if necessary.
-Do not include any unnecessary commentary or information outside of the coding context.
-Always focus on providing clear and concise code solutions.
-Never include explanations that are not directly related to the code.
-Always prioritize correctness and efficiency in your code solutions.
+Answer back to the user one exploration is done.
 """
 
 BASH_TOOL = {
@@ -41,13 +37,20 @@ BASH_TOOL = {
     },
 }
 
+def bash(command: str):
+    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    return result.stdout + result.stderr
+
+
 response = client.chat.completions.create(
     model=model_name,
     messages=[
         {"role": "system", "content": SYSTEM_PROMPT},
         {"role": "user", "content": user_input}
-    ]
+    ],
+    tools=[BASH_TOOL]
 )
+breakpoint()
 output = response.choices[0].message.content
 completion_details = response.usage.completion_tokens_details
 prompt_details = response.usage.prompt_tokens_details
