@@ -4,6 +4,8 @@ import subprocess
 from dotenv import load_dotenv
 from openai import OpenAI
 
+from thaniverse_cli.tools import TOOL_SCHEMAS
+
 load_dotenv()
 model_name = os.getenv("MODEL_NAME")
 
@@ -19,27 +21,48 @@ Use the bash tool to inspect files.
 Answer back to the user one exploration is done.
 """
 
-BASH_TOOL = {
-    "type": "function",
-    "function": {
-        "name": "bash",
-        "description": "Run a shell command and return its output.",
-        "parameters": {
-            "type": "object",
-            "properties": {
-                "command": {
-                    "type": "string",
-                    "description": "The shell command to run."
-                }
-            },
-            "required": ["command"]
-        },
-    },
-}
+# def bash(command: str):
+#     result = subprocess.run(command, shell=True, capture_output=True, text=True)
+#     return result.stdout + result.stderr
 
-def bash(command: str):
-    result = subprocess.run(command, shell=True, capture_output=True, text=True)
-    return result.stdout + result.stderr
+# def read_file(path: str) -> str:
+#     """Read the contents of a file and return it as a string."""
+#     with open(path, "r") as f:
+#         return f.read()
+
+# TOOL_SCHEMAS = [{
+#     "type": "function",
+#     "function": {
+#         "name": "bash",
+#         "description": "Run a shell command and return its output.",
+#         "parameters": {
+#             "type": "object",
+#             "properties": {
+#                 "command": {
+#                     "type": "string",
+#                     "description": "The shell command to run."
+#                 }
+#             },
+#             "required": ["command"]
+#         },
+#     },
+# }, {
+#     "type": "function",
+#     "function": {
+#         "name": "read_file",
+#         "description": "Read the contents of a file and return it as a string.",
+#         "parameters": {
+#             "type": "object",
+#             "properties": {
+#                 "path": {
+#                     "type": "string",
+#                     "description": "The path to the file to read."
+#                 }
+#             },
+#             "required": ["path"]
+#         },
+#     },
+# }]
 
 
 response = client.chat.completions.create(
@@ -48,7 +71,7 @@ response = client.chat.completions.create(
         {"role": "system", "content": SYSTEM_PROMPT},
         {"role": "user", "content": user_input}
     ],
-    tools=[BASH_TOOL]
+    tools=TOOL_SCHEMAS
 )
 breakpoint()
 output = response.choices[0].message.content
