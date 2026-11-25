@@ -4,7 +4,7 @@ import subprocess
 from dotenv import load_dotenv
 from openai import OpenAI
 
-from thaniverse_cli.tools import TOOL_SCHEMAS
+from tools import TOOL_SCHEMAS
 
 load_dotenv()
 model_name = os.getenv("MODEL_NAME")

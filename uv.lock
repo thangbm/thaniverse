@@ -215,17 +215,11 @@ wheels = [
 name = "thaniverse"
 version = "0.1.0"
 source = { virtual = "." }
-dependencies = [
-    { name = "thaniverse-cli" },
-]
-
-[package.metadata]
-requires-dist = [{ name = "thaniverse-cli", editable = "apps/cli" }]
 
 [[package]]
 name = "thaniverse-cli"
 version = "0.1.0"
-source = { editable = "apps/cli" }
+source = { virtual = "src/cli" }
 dependencies = [
     { name = "openai" },
     { name = "python-dotenv" },
