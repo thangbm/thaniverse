@@ -1,6 +1,6 @@
 # Thaniverse
 
-A [uv](https://docs.astral.sh/uv/) workspace monorepo. Apps live in `apps/`, shared libraries in `packages/`. Each one is a workspace member with its own `pyproject.toml`, and all members share a single `uv.lock` and `.venv`.
+Goodbye
 
 ## Structure
 
@@ -11,12 +11,12 @@ thaniverse/
 ├── .python-version
 ├── .env                        # local config (git-ignored)
 ├── apps/
-│   └── factory/                # coding-agent CLI  → package `factory`
+│   └── factory/                # coding-agent CLI   package `factory`
 │       ├── pyproject.toml
 │       └── factory/
 │           └── cli/            # agent.py, llm.py, main.py
 └── packages/
-    └── py_core/                # shared code → package `py-core` (import py_core)
+     py_core/                # shared code  package `py-core` (import py_core)
         ├── pyproject.toml
         ├── __init__.py
         └── tools.py
