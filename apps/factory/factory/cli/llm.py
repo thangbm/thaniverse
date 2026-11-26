@@ -4,7 +4,7 @@ import subprocess
 from dotenv import load_dotenv
 from openai import OpenAI
 
-from tools import TOOL_SCHEMAS
+from py_core.tools import TOOL_SCHEMAS
 
 load_dotenv()
 model_name = os.getenv("MODEL_NAME")
@@ -73,7 +73,7 @@ response = client.chat.completions.create(
     ],
     tools=TOOL_SCHEMAS
 )
-breakpoint()
+# breakpoint()
 output = response.choices[0].message.content
 completion_details = response.usage.completion_tokens_details
 prompt_details = response.usage.prompt_tokens_details

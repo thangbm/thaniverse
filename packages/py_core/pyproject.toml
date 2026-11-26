@@ -1,0 +1,24 @@
+[project]
+name = "py-core"
+version = "0.1.0"
+description = "Shared Python code for Thaniverse apps"
+requires-python = ">=3.15"
+dependencies = []
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# Flat package: this folder *is* the `py_core` package (tools.py sits next to pyproject.toml).
+# uv_build cannot do this, so this member uses hatchling.
+
+[tool.hatch.build.targets.wheel]
+include = ["*.py"]
+
+[tool.hatch.build.targets.wheel.sources]
+# Wheel: put the files in this folder under `py_core/`.
+"" = "py_core"
+
+[tool.hatch.build]
+# Editable install (uv sync): put packages/ on sys.path so `import py_core` finds this folder.
+dev-mode-dirs = [".."]

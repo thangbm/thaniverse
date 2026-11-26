@@ -7,12 +7,22 @@ authors = [
     { email = "thangbm@outlook.com" }
 ]
 requires-python = ">=3.15"
-dependencies = []
+# The root depends on every member, so a plain `uv sync` installs the whole workspace.
+dependencies = [
+    "py-core",
+    "factory",
+]
 
 [tool.uv]
+# The root is only the workspace's entry point. It has no code, so it is never built.
 package = false
 
-# Every directory under src/ is an application with its own pyproject.toml
-# (src/cli, src/api, src/desktop, ...).
 [tool.uv.workspace]
-members = ["src/*"]
+# Every directory matching these globs that has a pyproject.toml is a member.
+members = ["apps/*", "packages/*"]
+
+[tool.uv.sources]
+# Resolve these names from the workspace, never from PyPI.
+# Sources declared here apply to every member, so members do not repeat them.
+py-core = { workspace = true }
+factory = { workspace = true }

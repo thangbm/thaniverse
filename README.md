@@ -1,27 +1,33 @@
 # Thaniverse
 
-A [uv](https://docs.astral.sh/uv/) workspace monorepo. Every directory under `src/` is a standalone application with its own `pyproject.toml` and dependencies.
+A [uv](https://docs.astral.sh/uv/) workspace monorepo. Apps live in `apps/`, shared libraries in `packages/`. Each one is a workspace member with its own `pyproject.toml`, and all members share a single `uv.lock` and `.venv`.
 
 ## Structure
 
 ```
 thaniverse/
-├── pyproject.toml        # virtual root, workspace members = ["src/*"]
-├── uv.lock
+├── pyproject.toml              # workspace root (not built), members = apps/*, packages/*
+├── uv.lock                     # one lockfile for the whole workspace
 ├── .python-version
-├── .env                  # local config (git-ignored)
-└── src/
-    └── cli/              # coding-agent CLI (thaniverse-cli)
+├── .env                        # local config (git-ignored)
+├── apps/
+│   └── factory/                # coding-agent CLI  → package `factory`
+│       ├── pyproject.toml
+│       └── factory/
+│           └── cli/            # agent.py, llm.py, main.py
+└── packages/
+    └── py_core/                # shared code → package `py-core` (import py_core)
         ├── pyproject.toml
-        ├── agent.py
-        ├── llm.py
-        ├── main.py
+        ├── __init__.py
         └── tools.py
 ```
 
-`src/` contains applications only (`cli`, and later `api`, `desktop`, ...). The root is a virtual project, so it has no code or dependencies of its own.
+Members are real packages installed in editable mode, so they import each other by package name.
+Apps use `uv_build` with a flat layout. Libraries in `packages/` use hatchling so the folder itself is the package (no nested `py_core/py_core/`); see `packages/py_core/pyproject.toml`. A library's folder name must be a valid Python identifier (`py_core`, not `py-core`).
 
-Apps are not built as packages (`package = false`). They are run as scripts, so modules inside an app import each other directly (for example `from tools import TOOL_SCHEMAS`).
+```python
+from py_core.tools import TOOL_SCHEMAS
+```
 
 ## Requirements
 
@@ -31,8 +37,10 @@ Apps are not built as packages (`package = false`). They are run as scripts, so 
 ## Setup
 
 ```sh
-uv sync --all-packages
+uv sync
 ```
+
+The root depends on every member, so this installs the whole workspace into `.venv`.
 
 Create a `.env` file in the repo root:
 
@@ -44,35 +52,36 @@ MODEL_NAME=
 
 ## Running
 
-Use `--package` to pick the app whose environment to use:
-
 ```sh
-uv run --package thaniverse-cli python src/cli/llm.py
+uv run factory                                   # console script from [project.scripts]
+uv run python -m factory.cli.llm      # run a module directly
 ```
 
-## Adding an application
+## Adding a member
 
-1. Create `src/<name>/pyproject.toml`:
+1. Create the member:
 
-   ```toml
-   [project]
-   name = "thaniverse-<name>"
-   version = "0.1.0"
-   requires-python = ">=3.15"
-   dependencies = []
+   - **App** (`apps/<name>/`):
 
-   [tool.uv]
-   package = false
+     ```sh
+     uv init --package apps/<name>
+     ```
+
+     Run from the repo root, `uv init` detects the workspace. It creates a `src/` layout; move `src/<name>/` up one level, then add `[tool.uv.build-backend]` with `module-root = ""`.
+   - **Library** (`packages/<name>/`, `<name>` a valid Python identifier): copy `packages/py_core/pyproject.toml`, change `name`, and set `"" = "<name>"` under `[tool.hatch.build.targets.wheel.sources]`. Put the `.py` files directly in the folder.
+2. To use a library from another member, add it as a workspace dependency:
+
+   ```sh
+   uv add --package <app> <lib>
    ```
 
-2. Add the app's code in `src/<name>/`.
-3. Run `uv sync --all-packages`. The `src/*` workspace glob picks the new app up automatically.
-4. Run it with `uv run --package thaniverse-<name> python src/<name>/<entry>.py`.
+   Then add `<lib> = { workspace = true }` to `[tool.uv.sources]` in the root `pyproject.toml` (if `uv add` wrote it into the member instead, you can move it).
+3. Add the new member to the root `dependencies` (and `[tool.uv.sources]`) so `uv sync` installs it.
 
 ## Dependencies
 
-Add dependencies to the app that needs them:
+Add a dependency to the member that needs it:
 
 ```sh
-uv add --package thaniverse-cli <dependency>
+uv add --package factory <dependency>
 ```
