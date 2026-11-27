@@ -1,10 +1,9 @@
 import os
-import json
 
 from dotenv import load_dotenv
 from openai import OpenAI
 
-from py_core.tools import TOOL_SCHEMAS, TOOLS
+from py_core.tools import TOOL_SCHEMAS
 
 load_dotenv()
 model_name = os.getenv("MODEL_NAME")

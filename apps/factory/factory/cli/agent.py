@@ -1,6 +1,6 @@
 import json
 from py_core.tools import TOOLS
-from factory.cli.llm import call_llm, SYSTEM_PROMPT
+from py_core.llm import call_llm, SYSTEM_PROMPT
 from py_core.context import reminder
 
 user_input = input("Enter your prompt> ")
